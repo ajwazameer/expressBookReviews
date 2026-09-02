@@ -8,11 +8,7 @@ public_users.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   if (username && password) {
-    if (
-      users.some((user) => {
-        return user.username === username;
-      })
-    ) {
+    if (isValid(username)) {
       return res.status(203).json({ message: "Username already exists" });
     } else {
       users.push({ username: username, password: password });
