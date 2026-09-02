@@ -2,6 +2,7 @@ const express = require("express");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
+const axios = require("axios");
 const public_users = express.Router();
 
 public_users.post("/register", (req, res) => {
@@ -20,8 +21,17 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get the book list available in the shop
-public_users.get("/", function (req, res) {
+public_users.get("/books", function async(req, res) {
   return res.status(200).send(JSON.stringify(books, null, 2));
+});
+
+public_users.get("/", async function async(req, res) {
+  try {
+    const response = await axios.get("http://localhost:5000/books");
+    return res.status(200).send(JSON.stringify(response.data, null, 2));
+  } catch (error) {
+    return res.status(400).send(error);
+  }
 });
 
 // Get book details based on ISBN
@@ -67,7 +77,7 @@ public_users.get("/title/:title", function (req, res) {
 public_users.get("/review/:isbn", function (req, res) {
   const isbn = req.params.isbn;
   const book = books[isbn];
-  if (book === "" || book == null || book.reviews) {
+  if (book === "" || book == null || !book.reviews) {
     return res.status(404).json({ message: "No book review found!" });
   } else {
     return res.status(200).json(book.reviews);
