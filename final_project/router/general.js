@@ -25,23 +25,46 @@ public_users.get("/books", function async(req, res) {
   return res.status(200).send(JSON.stringify(books, null, 2));
 });
 
-public_users.get("/", async function async(req, res) {
+public_users.get("/", async function (req, res) {
   try {
     const response = await axios.get("http://localhost:5000/books");
-    return res.status(200).send(JSON.stringify(response.data, null, 2));
+
+    return res.status(200).json(response.data);
   } catch (error) {
-    return res.status(400).send(error);
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Error getting books",
+    });
   }
 });
 
 // Get book details based on ISBN
-public_users.get("/isbn/:isbn", function (req, res) {
+public_users.get("/book/isbn/:isbn", function (req, res) {
   const isbn = req.params.isbn;
+  console.log(isbn);
   const book = books[isbn];
+  console.log(book);
   if (book === "" || book == null) {
     return res.status(404).json({ message: "No book found!" });
   } else {
     return res.status(200).json(book);
+  }
+});
+
+public_users.get("/isbn/:isbn", async function (req, res) {
+  try {
+    const isbn = req.params.isbn;
+
+    const response = await axios.get(`http://localhost:5000/book/isbn/${isbn}`);
+
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(404).json({
+      message: "No book found!",
+    });
   }
 });
 
