@@ -100,7 +100,7 @@ public_users.get("/author/:author", async function (req, res) {
 });
 
 // Get all books based on title
-public_users.get("/title/:title", function (req, res) {
+public_users.get("/book/title/:title", function (req, res) {
   const title = req.params.title;
   const booksArray = Object.values(books);
   const book = booksArray.filter((book) => {
@@ -110,6 +110,23 @@ public_users.get("/title/:title", function (req, res) {
     return res.status(404).json({ message: "No book found!" });
   } else {
     return res.status(200).json(book);
+  }
+});
+public_users.get("/title/:title", async function (req, res) {
+  try {
+    const title = req.params.title;
+
+    const response = await axios.get(
+      `http://localhost:5000/book/title/${title}`,
+    );
+
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(404).json({
+      message: "No book found!",
+    });
   }
 });
 
